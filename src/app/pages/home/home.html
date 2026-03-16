@@ -1,0 +1,97 @@
+<!-- Hero Section -->
+<section class="hero">
+  <div class="hero-content">
+    <h1 class="hero-title">
+      Encuentra los Mejores<br>
+      <span class="highlight">Eventos</span> y Compra tus Entradas
+    </h1>
+    <p class="hero-subtitle">
+      Conciertos, teatro, deportes y más. Todo en un solo lugar.
+    </p>
+    <div class="hero-actions">
+      <a routerLink="/eventos" class="btn btn-primary">Ver Todos los Eventos</a>
+    </div>
+  </div>
+  <div class="hero-stats">
+    <div class="stat">
+      <span class="stat-number">100+</span>
+      <span class="stat-label">Eventos</span>
+    </div>
+    <div class="stat">
+      <span class="stat-number">50K+</span>
+      <span class="stat-label">Clientes</span>
+    </div>
+    <div class="stat">
+      <span class="stat-number">5⭐</span>
+      <span class="stat-label">Calificación</span>
+    </div>
+  </div>
+</section>
+
+<!-- Categories Section -->
+<section class="section categories-section">
+  <div class="container">
+    <h2 class="section-title">Categorías</h2>
+    <div class="categories-grid">
+      @for (category of categories; track category) {
+        <a [routerLink]="['/eventos']" [queryParams]="{categoria: category}" class="category-card">
+          <span class="category-icon">
+            @switch (category) {
+              @case ('Concierto') { 🎵 }
+              @case ('Teatro') { 🎭 }
+              @case ('Deporte') { 🏆 }
+              @case ('Espectáculo') { 🎪 }
+              @case ('Comedia') { 😂 }
+              @default { 🎟️ }
+            }
+          </span>
+          <span class="category-name">{{ category }}</span>
+        </a>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- Featured Events Section -->
+<section class="section featured-section">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Eventos Destacados</h2>
+      <a routerLink="/eventos" class="see-all-link">Ver todos →</a>
+    </div>
+    <div class="events-grid">
+      @for (event of featuredEvents; track event.id) {
+        <div class="event-card">
+          <div class="event-image">
+            <img [src]="event.imageUrl" [alt]="event.name" loading="lazy">
+            <span class="event-category">{{ event.category }}</span>
+          </div>
+          <div class="event-body">
+            <h3 class="event-name">{{ event.name }}</h3>
+            <div class="event-meta">
+              <span>📅 {{ event.date | date:'dd MMM yyyy' : '' : 'es' }}</span>
+              <span>📍 {{ event.venue }}, {{ event.city }}</span>
+            </div>
+            <p class="event-description">{{ event.description }}</p>
+            <div class="event-footer">
+              <div class="event-price">
+                <span class="price-from">Desde</span>
+                <span class="price-value">{{ (event.tickets | minPrice) | currency:'ARS':'symbol':'1.0-0' }}</span>
+              </div>
+              <a [routerLink]="['/eventos', event.id]" class="btn btn-primary btn-sm">Comprar</a>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section">
+  <div class="container">
+    <h2>¿Listo para vivir una experiencia única?</h2>
+    <p>Descubre todos los eventos disponibles y asegura tu lugar hoy.</p>
+    <a routerLink="/eventos" class="btn btn-outline">Explorar Eventos</a>
+  </div>
+</section>

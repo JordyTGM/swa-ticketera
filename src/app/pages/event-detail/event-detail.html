@@ -1,0 +1,132 @@
+@if (notFound) {
+  <div class="not-found">
+    <span class="not-found-icon">🎭</span>
+    <h2>Evento no encontrado</h2>
+    <p>El evento que buscas no existe o ya no está disponible.</p>
+    <a routerLink="/eventos" class="btn btn-primary">Ver todos los eventos</a>
+  </div>
+} @else if (event) {
+  <div class="event-detail-page">
+    <!-- Hero Banner -->
+    <div class="event-hero" [style.background-image]="'url(' + event.imageUrl + ')'">
+      <div class="event-hero-overlay">
+        <div class="container">
+          <a routerLink="/eventos" class="back-link">← Volver a eventos</a>
+          <span class="event-badge">{{ event.category }}</span>
+          <h1 class="event-hero-title">{{ event.name }}</h1>
+          <div class="event-hero-meta">
+            <span>📅 {{ event.date | date:'EEEE dd MMMM yyyy' : '' : 'es' }}</span>
+            <span>🕐 {{ event.time }}hs</span>
+            <span>📍 {{ event.venue }}, {{ event.city }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="detail-layout">
+        <!-- Main Content -->
+        <div class="detail-main">
+          <section class="detail-section">
+            <h2>Sobre el Evento</h2>
+            <p class="event-full-description">{{ event.description }}</p>
+          </section>
+
+          <section class="detail-section">
+            <h2>Información del Lugar</h2>
+            <div class="venue-info">
+              <div class="venue-detail">
+                <span class="venue-label">🏟️ Recinto</span>
+                <span class="venue-value">{{ event.venue }}</span>
+              </div>
+              <div class="venue-detail">
+                <span class="venue-label">📍 Ciudad</span>
+                <span class="venue-value">{{ event.city }}</span>
+              </div>
+              <div class="venue-detail">
+                <span class="venue-label">📅 Fecha</span>
+                <span class="venue-value">{{ event.date | date:'dd/MM/yyyy' }}</span>
+              </div>
+              <div class="venue-detail">
+                <span class="venue-label">🕐 Hora</span>
+                <span class="venue-value">{{ event.time }}hs</span>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- Ticket Selection Sidebar -->
+        <aside class="ticket-sidebar">
+          <div class="ticket-selector">
+            <h3>Seleccionar Entradas</h3>
+
+            <div class="ticket-types">
+              @for (ticket of event.tickets; track ticket.id) {
+                <button
+                  class="ticket-type-btn"
+                  [class.selected]="selectedTicket?.id === ticket.id"
+                  [disabled]="ticket.available === 0"
+                  (click)="selectTicket(ticket)"
+                >
+                  <div class="ticket-type-info">
+                    <span class="ticket-type-name">{{ ticket.type }}</span>
+                    <span class="ticket-availability" [class.low]="ticket.available < 50 && ticket.available > 0">
+                      @if (ticket.available === 0) {
+                        Agotado
+                      } @else if (ticket.available < 50) {
+                        ¡Últimos {{ ticket.available }}!
+                      } @else {
+                        Disponibles: {{ ticket.available }}
+                      }
+                    </span>
+                  </div>
+                  <span class="ticket-type-price">{{ ticket.price | currency:'ARS':'symbol':'1.0-0' }}</span>
+                </button>
+              }
+            </div>
+
+            @if (selectedTicket && selectedTicket.available > 0) {
+              <div class="quantity-selector">
+                <label>Cantidad</label>
+                <div class="qty-controls">
+                  <button class="qty-btn" (click)="decreaseQty()" [disabled]="quantity <= 1">−</button>
+                  <span class="qty-value">{{ quantity }}</span>
+                  <button class="qty-btn" (click)="increaseQty()" [disabled]="quantity >= 10">+</button>
+                </div>
+              </div>
+
+              <div class="price-summary">
+                <div class="price-row">
+                  <span>{{ selectedTicket.type }} × {{ quantity }}</span>
+                  <span>{{ selectedTicket.price | currency:'ARS':'symbol':'1.0-0' }} c/u</span>
+                </div>
+                <div class="price-row total">
+                  <span>Total</span>
+                  <span>{{ totalPrice | currency:'ARS':'symbol':'1.0-0' }}</span>
+                </div>
+              </div>
+
+              <div class="action-buttons">
+                <button class="btn btn-primary btn-full" (click)="addToCart()">
+                  @if (addedToCart()) {
+                    ✓ Añadido al carrito
+                  } @else {
+                    🛒 Añadir al carrito
+                  }
+                </button>
+                <button class="btn btn-secondary btn-full" (click)="buyNow()">Comprar ahora</button>
+              </div>
+            }
+
+            @if (selectedTicket && selectedTicket.available === 0) {
+              <div class="sold-out-message">
+                <span>😔</span>
+                <p>Esta entrada está agotada. Selecciona otro tipo de entrada.</p>
+              </div>
+            }
+          </div>
+        </aside>
+      </div>
+    </div>
+  </div>
+}

@@ -1,0 +1,92 @@
+<div class="cart-page">
+  <div class="page-header">
+    <div class="container">
+      <h1>🛒 Mi Carrito</h1>
+      <p>Revisa tus entradas antes de continuar</p>
+    </div>
+  </div>
+
+  <div class="container">
+    @if (cartService.cartItems().length > 0) {
+      <div class="cart-layout">
+        <!-- Cart Items -->
+        <div class="cart-items">
+          @for (item of cartService.cartItems(); track item.ticket.id + '-' + item.event.id) {
+            <div class="cart-item">
+              <div class="item-image">
+                <img [src]="item.event.imageUrl" [alt]="item.event.name">
+              </div>
+              <div class="item-details">
+                <div class="item-header">
+                  <div>
+                    <h3 class="item-event-name">{{ item.event.name }}</h3>
+                    <span class="item-ticket-type">{{ item.ticket.type }}</span>
+                  </div>
+                  <button class="remove-btn" (click)="removeItem(item.ticket.id, item.event.id)" aria-label="Eliminar">✕</button>
+                </div>
+                <div class="item-meta">
+                  <span>📅 {{ item.event.date }}</span>
+                  <span>📍 {{ item.event.venue }}, {{ item.event.city }}</span>
+                </div>
+                <div class="item-footer">
+                  <div class="qty-controls">
+                    <button class="qty-btn" (click)="updateQuantity(item.ticket.id, item.event.id, item.quantity - 1)" [disabled]="item.quantity <= 1">−</button>
+                    <span class="qty-value">{{ item.quantity }}</span>
+                    <button class="qty-btn" (click)="updateQuantity(item.ticket.id, item.event.id, item.quantity + 1)" [disabled]="item.quantity >= 10">+</button>
+                  </div>
+                  <div class="item-price">
+                    <span class="unit-price">{{ item.ticket.price | currency:'ARS':'symbol':'1.0-0' }} c/u</span>
+                    <span class="total-price">{{ (item.ticket.price * item.quantity) | currency:'ARS':'symbol':'1.0-0' }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
+
+          <div class="cart-actions">
+            <button class="btn btn-ghost" (click)="clearCart()">🗑️ Vaciar carrito</button>
+            <a routerLink="/eventos" class="btn btn-ghost">← Seguir comprando</a>
+          </div>
+        </div>
+
+        <!-- Order Summary -->
+        <aside class="order-summary">
+          <div class="summary-card">
+            <h3>Resumen del pedido</h3>
+
+            <div class="summary-lines">
+              @for (item of cartService.cartItems(); track item.ticket.id + '-' + item.event.id) {
+                <div class="summary-line">
+                  <span class="summary-item-name">{{ item.event.name | slice:0:25 }}... ({{ item.ticket.type }}) ×{{ item.quantity }}</span>
+                  <span>{{ (item.ticket.price * item.quantity) | currency:'ARS':'symbol':'1.0-0' }}</span>
+                </div>
+              }
+            </div>
+
+            <div class="summary-divider"></div>
+
+            <div class="summary-total">
+              <span>Total</span>
+              <span class="total-amount">{{ cartService.totalPrice() | currency:'ARS':'symbol':'1.0-0' }}</span>
+            </div>
+
+            <a routerLink="/checkout" class="btn btn-primary btn-full">
+              Continuar al pago →
+            </a>
+
+            <div class="security-note">
+              🔒 Compra segura y protegida
+            </div>
+          </div>
+        </aside>
+      </div>
+    } @else {
+      <div class="empty-cart">
+        <span class="empty-icon">🛒</span>
+        <h2>Tu carrito está vacío</h2>
+        <p>Todavía no has agregado ninguna entrada a tu carrito.</p>
+        <a routerLink="/eventos" class="btn btn-primary">Explorar Eventos</a>
+      </div>
+    }
+  </div>
+</div>

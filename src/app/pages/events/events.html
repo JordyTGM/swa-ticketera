@@ -1,0 +1,79 @@
+<div class="events-page">
+  <div class="page-header">
+    <div class="container">
+      <h1>Todos los Eventos</h1>
+      <p>Encuentra el evento perfecto para ti</p>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Search & Filters -->
+    <div class="filters-bar">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input
+          type="text"
+          placeholder="Buscar eventos, artistas, lugares..."
+          [(ngModel)]="searchQuery"
+          (ngModelChange)="applyFilters()"
+          class="search-input"
+        >
+      </div>
+      <div class="category-filters">
+        @for (category of categories; track category) {
+          <button
+            class="filter-btn"
+            [class.active]="selectedCategory === category"
+            (click)="selectCategory(category)"
+          >
+            {{ category }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Results -->
+    <div class="results-info">
+      <span>{{ filteredEvents.length }} evento(s) encontrado(s)</span>
+    </div>
+
+    @if (filteredEvents.length > 0) {
+      <div class="events-grid">
+        @for (event of filteredEvents; track event.id) {
+          <div class="event-card">
+            <div class="event-image">
+              <img [src]="event.imageUrl" [alt]="event.name" loading="lazy">
+              <span class="event-category">{{ event.category }}</span>
+              @if (event.featured) {
+                <span class="event-featured">⭐ Destacado</span>
+              }
+            </div>
+            <div class="event-body">
+              <h3 class="event-name">{{ event.name }}</h3>
+              <div class="event-meta">
+                <span>📅 {{ event.date | date:'EEEE dd MMM yyyy' : '' : 'es' }}</span>
+                <span>🕐 {{ event.time }}hs</span>
+                <span>📍 {{ event.venue }}, {{ event.city }}</span>
+              </div>
+              <p class="event-description">{{ event.description }}</p>
+              <div class="event-footer">
+                <div class="event-price">
+                  <span class="price-from">Desde</span>
+                  <span class="price-value">{{ (event.tickets | minPrice) | currency:'ARS':'symbol':'1.0-0' }}</span>
+                </div>
+                <a [routerLink]="['/eventos', event.id]" class="btn btn-primary btn-sm">Ver Entradas</a>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="empty-state">
+        <span class="empty-icon">🔍</span>
+        <h3>No se encontraron eventos</h3>
+        <p>Intenta con otro término de búsqueda o categoría.</p>
+        <button class="btn btn-primary" (click)="selectCategory('Todos'); searchQuery = ''">Ver todos los eventos</button>
+      </div>
+    }
+  </div>
+</div>

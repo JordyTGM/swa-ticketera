@@ -1,0 +1,145 @@
+@if (orderPlaced()) {
+  <!-- Order Confirmation -->
+  <div class="order-confirmation">
+    <div class="confirmation-card">
+      <div class="confirmation-icon">🎉</div>
+      <h1>¡Compra exitosa!</h1>
+      <p class="order-number">Número de pedido: <strong>{{ orderNumber() }}</strong></p>
+      <p class="confirmation-message">
+        Tus entradas han sido confirmadas. Recibirás un correo electrónico con los detalles de tu compra.
+      </p>
+      <div class="confirmation-actions">
+        <a routerLink="/" class="btn btn-primary">Volver al inicio</a>
+        <a routerLink="/eventos" class="btn btn-outline">Ver más eventos</a>
+      </div>
+    </div>
+  </div>
+} @else if (cartItems().length === 0) {
+  <!-- Empty cart redirect -->
+  <div class="empty-redirect">
+    <span class="empty-icon">🛒</span>
+    <h2>No tienes entradas en tu carrito</h2>
+    <a routerLink="/eventos" class="btn btn-primary">Ver Eventos</a>
+  </div>
+} @else {
+  <!-- Checkout Form -->
+  <div class="checkout-page">
+    <div class="page-header">
+      <div class="container">
+        <a routerLink="/carrito" class="back-link">← Volver al carrito</a>
+        <h1>Finalizar Compra</h1>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="checkout-layout">
+        <!-- Form -->
+        <form (ngSubmit)="submitOrder()" #checkoutForm="ngForm" class="checkout-form">
+          <!-- Personal Info -->
+          <section class="form-section">
+            <h2>👤 Datos personales</h2>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="firstName">Nombre *</label>
+                <input id="firstName" type="text" [(ngModel)]="form.firstName" name="firstName" required placeholder="Ej: Juan">
+              </div>
+              <div class="form-group">
+                <label for="lastName">Apellido *</label>
+                <input id="lastName" type="text" [(ngModel)]="form.lastName" name="lastName" required placeholder="Ej: García">
+              </div>
+              <div class="form-group">
+                <label for="email">Email *</label>
+                <input id="email" type="email" [(ngModel)]="form.email" name="email" required placeholder="tu@email.com">
+              </div>
+              <div class="form-group">
+                <label for="phone">Teléfono</label>
+                <input id="phone" type="tel" [(ngModel)]="form.phone" name="phone" placeholder="+54 11 0000-0000">
+              </div>
+            </div>
+          </section>
+
+          <!-- Payment Info -->
+          <section class="form-section">
+            <h2>💳 Datos de pago</h2>
+            <div class="form-group">
+              <label for="cardNumber">Número de tarjeta *</label>
+              <input
+                id="cardNumber"
+                type="text"
+                [(ngModel)]="form.cardNumber"
+                name="cardNumber"
+                required
+                placeholder="0000 0000 0000 0000"
+                (input)="formatCardNumber($event)"
+                maxlength="19"
+              >
+            </div>
+            <div class="form-group">
+              <label for="cardName">Nombre en la tarjeta *</label>
+              <input id="cardName" type="text" [(ngModel)]="form.cardName" name="cardName" required placeholder="Ej: JUAN GARCIA">
+            </div>
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label for="cardExpiry">Vencimiento (MM/AA) *</label>
+                <input
+                  id="cardExpiry"
+                  type="text"
+                  [(ngModel)]="form.cardExpiry"
+                  name="cardExpiry"
+                  required
+                  placeholder="MM/AA"
+                  (input)="formatExpiry($event)"
+                  maxlength="5"
+                >
+              </div>
+              <div class="form-group">
+                <label for="cardCvv">CVV *</label>
+                <input id="cardCvv" type="text" [(ngModel)]="form.cardCvv" name="cardCvv" required placeholder="123" maxlength="4">
+              </div>
+            </div>
+          </section>
+
+          <button
+            type="submit"
+            class="btn btn-primary btn-full btn-large"
+            [disabled]="!checkoutForm.valid || isProcessing()"
+          >
+            @if (isProcessing()) {
+              ⏳ Procesando pago...
+            } @else {
+              🔒 Confirmar pago — {{ totalPrice() | currency:'ARS':'symbol':'1.0-0' }}
+            }
+          </button>
+
+          <p class="security-disclaimer">
+            🔒 Tus datos están protegidos con encriptación SSL. No guardamos los datos de tu tarjeta.
+          </p>
+        </form>
+
+        <!-- Order Summary -->
+        <aside class="checkout-summary">
+          <div class="summary-card">
+            <h3>Tu pedido</h3>
+            <div class="summary-items">
+              @for (item of cartItems(); track item.ticket.id + '-' + item.event.id) {
+                <div class="summary-item">
+                  <img [src]="item.event.imageUrl" [alt]="item.event.name" class="item-thumb">
+                  <div class="item-info">
+                    <span class="item-name">{{ item.event.name }}</span>
+                    <span class="item-type">{{ item.ticket.type }} × {{ item.quantity }}</span>
+                  </div>
+                  <span class="item-total">{{ (item.ticket.price * item.quantity) | currency:'ARS':'symbol':'1.0-0' }}</span>
+                </div>
+              }
+            </div>
+            <div class="summary-divider"></div>
+            <div class="summary-total">
+              <span>Total a pagar</span>
+              <span class="total-amount">{{ totalPrice() | currency:'ARS':'symbol':'1.0-0' }}</span>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </div>
+}
